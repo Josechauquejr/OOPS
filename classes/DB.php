@@ -79,23 +79,24 @@ class DB
         // Retorna o objeto da própria classe, permitindo encadeamento de métodos
         return $this;
     }
-    
-    private function action($action, $table, $where = array()) {
+
+    private function action($action, $table, $where = array())
+    {
         // Verifica se o array $where possui exatamente 3 elementos
         if (count($where) === 3) {
             // Define os operadores permitidos para comparação
             $operators = array('=', '>', '<', '>=', '<=');
-    
+
             // Atribui os elementos de $where para variáveis locais
             $field    = $where[0]; // Campo da tabela
             $operator = $where[1]; // Operador de comparação
             $value    = $where[2]; // Valor a ser comparado
-    
+
             // Verifica se o operador fornecido é válido
             if (in_array($operator, $operators)) {
                 // Constrói a query SQL dinamicamente
                 $sql = "{$action} FROM {$table} WHERE {$field} {$operator} ?";
-    
+
                 // Executa a query e verifica se há erros
                 if (!$this->query($sql, array($value))->error()) {
                     // Retorna a própria instância em caso de sucesso (padrão Fluent Interface)
@@ -103,25 +104,67 @@ class DB
                 }
             }
         }
-    
+
         // Retorna false caso as condições não sejam satisfeitas
         return false;
     }
-    
-    public function get($table, $where) {
+
+    public function get($table, $where)
+    {
         // Método que chama 'action' para fazer uma consulta SELECT
         return $this->action('SELECT *', $table, $where);
     }
-    
-    public function delete($table, $where) {
+    public function insert($table, $fields = array())
+    {
+        if (count($fields)) {
+            // Define os nomes dos campos e prepara os placeholders
+            $keys = array_keys($fields);
+            $values = implode(', ', array_fill(0, count($fields), '?'));
+
+            // Constrói a query corretamente
+            $sql = "INSERT INTO {$table} (`" . implode('`, `', $keys) . "`) VALUES ({$values})";
+
+            // Executa a query e retorna 'true' em caso de sucesso
+            if (!$this->query($sql, array_values($fields))->error()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function update($table,$id,$fields){
+      $set = '';   
+      $x=1;
+
+      foreach ($fields as $name => $value) {
+        $set .= "{$name} = ?";
+
+        if($x < count($fields)){
+            $set .= ', ';
+        }
+        $x++;
+      }
+
+      $sql = "UPDATE {$table} SET {$set} WHERE id = {$id}";
+
+      if(!$this->query($sql,$fields)->error()){
+        return true;
+      }
+
+      return false;
+    }
+
+    public function delete($table, $where)
+    {
         // Método que chama 'action' para fazer uma consulta DELETE
         return $this->action('DELETE', $table, $where);
     }
 
-    public function result(){
+    public function result()
+    {
         return $this->_results;
     }
-    
+
     // Método público 'error' para retornar o estado de erro
     public function error()
     {
@@ -129,8 +172,8 @@ class DB
         return $this->_error;
     }
 
-    public function count(){
-        return $this-> _count;
+    public function count()
+    {
+        return $this->_count;
     }
-
 }

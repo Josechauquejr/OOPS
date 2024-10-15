@@ -7,10 +7,23 @@ require_once 'core/init.php';
 
 //DB::getInstance();
 
-$user = DB::getInstance()->get('users',array('username','=','jose'));
+/*$user = DB::getInstance()->get('users',array('username','=','jose'));
 
 if($user->count()){
     echo "User found";
 }else{
     echo "User not found";
 }
+*/
+
+/*$user = DB::getInstance()->insert('users',array(
+    'username' => 'josejr',
+    'password' => '123',
+    'salt' => 'salt',
+    'group' => '2'
+));*/
+
+$user = DB::getInstance()->update('users',2,array(
+    'username' => 'josejr',
+    'password' => 'chauque',
+));
