@@ -5,4 +5,12 @@ require_once 'core/init.php';
 // Nesse exemplo, ele tenta buscar o valor da chave 'host' dentro de 'mysql' na configuração global
 //echo Config::get('mysql/host/'); // Exibe (com echo) o valor da chave 'host' dentro de 'mysql', por exemplo, '127.0.0.1'
 
-DB::getInstance();
+//DB::getInstance();
+
+$user = DB::getInstance()->get('users',array('username','=','jose'));
+
+if($user->count()){
+    echo "User found";
+}else{
+    echo "User not found";
+}
